@@ -689,22 +689,19 @@ export default function HomePage() {
               {youtubePosts.map(
                 (post) => (
 
-                  <article
+                  <a
                     className="notice-mini-card"
                     key={
                       post.post_id ||
                       post.id
                     }
-                    onClick={() =>
-                      openYoutubePost(
-                        post.post_url
-                      )
-                    }
+                    href={post.post_url || undefined}
+                    target={post.post_url ? "_blank" : undefined}
+                    rel={post.post_url ? "noopener noreferrer" : undefined}
                     style={{
-                      cursor:
-                        post.post_url
-                          ? "pointer"
-                          : "default"
+                      cursor: post.post_url ? "pointer" : "default",
+                      textDecoration: "none",
+                      color: "inherit"
                     }}
                   >
 
@@ -803,7 +800,7 @@ export default function HomePage() {
 
                     </div>
 
-                  </article>
+                  </a>
 
                 )
               )}
@@ -903,19 +900,16 @@ export default function HomePage() {
               {liveMembers.map(
                 (item) => (
 
-                  <article
+                  <a
                     className="live-mini-card"
                     key={item.id}
-                    onClick={() =>
-                      openLive(
-                        item.live_url
-                      )
-                    }
+                    href={item.live_url || undefined}
+                    target={item.live_url ? "_blank" : undefined}
+                    rel={item.live_url ? "noopener noreferrer" : undefined}
                     style={{
-                      cursor:
-                        item.live_url
-                          ? "pointer"
-                          : "default"
+                      cursor: item.live_url ? "pointer" : "default",
+                      textDecoration: "none",
+                      color: "inherit"
                     }}
                   >
 
@@ -1015,7 +1009,7 @@ export default function HomePage() {
 
                     </div>
 
-                  </article>
+                  </a>
 
                 )
               )}
@@ -1104,19 +1098,16 @@ export default function HomePage() {
               {shorts.map(
                 (item) => (
 
-                  <article
+                  <a
                     className="short-mini-card"
                     key={item.id}
-                    onClick={() =>
-                      openShort(
-                        item.short_url
-                      )
-                    }
+                    href={item.short_url || undefined}
+                    target={item.short_url ? "_blank" : undefined}
+                    rel={item.short_url ? "noopener noreferrer" : undefined}
                     style={{
-                      cursor:
-                        item.short_url
-                          ? "pointer"
-                          : "default"
+                      cursor: item.short_url ? "pointer" : "default",
+                      textDecoration: "none",
+                      color: "inherit"
                     }}
                   >
 
@@ -1164,7 +1155,7 @@ export default function HomePage() {
 
                     </div>
 
-                  </article>
+                  </a>
 
                 )
               )}
@@ -1254,19 +1245,16 @@ export default function HomePage() {
               {videos.map(
                 (item) => (
 
-                  <article
+                  <a
                     className="video-mini-card"
                     key={item.id}
-                    onClick={() =>
-                      openVideo(
-                        item.video_url
-                      )
-                    }
+                    href={item.video_url || undefined}
+                    target={item.video_url ? "_blank" : undefined}
+                    rel={item.video_url ? "noopener noreferrer" : undefined}
                     style={{
-                      cursor:
-                        item.video_url
-                          ? "pointer"
-                          : "default"
+                      cursor: item.video_url ? "pointer" : "default",
+                      textDecoration: "none",
+                      color: "inherit"
                     }}
                   >
 
@@ -1306,7 +1294,7 @@ export default function HomePage() {
 
                     </div>
 
-                  </article>
+                  </a>
 
                 )
               )}
