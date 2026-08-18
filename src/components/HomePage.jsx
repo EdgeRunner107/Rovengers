@@ -183,8 +183,8 @@ export default function HomePage() {
   // ====================================================
   // iframe LIVE 주소
   //
-  // 재생 목적 X
-  // 화면/썸네일 표시 목적
+  // 화면 표시용
+  // 클릭은 부모 <a> 태그가 처리
   // ====================================================
 
   const getLiveEmbedUrl = (item) => {
@@ -213,26 +213,6 @@ export default function HomePage() {
       (origin
         ? `&origin=${origin}`
         : "")
-    );
-  };
-
-  // ====================================================
-  // LIVE 페이지 이동
-  // ====================================================
-
-  const openLive = (item) => {
-
-    const url =
-      getLiveUrl(item);
-
-    if (!url) {
-      return;
-    }
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
     );
   };
 
@@ -596,21 +576,44 @@ export default function HomePage() {
 
                 return (
 
-                  <article
+                  <a
                     className="live-mini-card"
                     key={
                       item.id ||
                       item.member_id ||
                       item.channel_id
                     }
+
+                    href={
+                      liveUrl ||
+                      undefined
+                    }
+
+                    target={
+                      liveUrl
+                        ? "_blank"
+                        : undefined
+                    }
+
+                    rel={
+                      liveUrl
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+
                     style={{
+                      display: "block",
                       textDecoration: "none",
-                      color: "inherit"
+                      color: "inherit",
+                      cursor:
+                        liveUrl
+                          ? "pointer"
+                          : "default"
                     }}
                   >
 
                     {/* ====================================
-                        LIVE iframe 썸네일
+                        LIVE iframe 화면
                     ==================================== */}
 
                     <div
@@ -620,11 +623,7 @@ export default function HomePage() {
                         width: "100%",
                         aspectRatio: "16 / 9",
                         overflow: "hidden",
-                        background: "#000",
-                        cursor:
-                          liveUrl
-                            ? "pointer"
-                            : "default"
+                        background: "#000"
                       }}
                     >
 
@@ -637,6 +636,7 @@ export default function HomePage() {
                           tabIndex={-1}
                           aria-hidden="true"
                           referrerPolicy="strict-origin-when-cross-origin"
+
                           style={{
                             position: "absolute",
                             inset: 0,
@@ -648,10 +648,10 @@ export default function HomePage() {
                             display: "block",
 
                             /*
-                             * iframe 자체는 클릭 불가능
+                             * 중요
                              *
-                             * 사용자가 클릭하면
-                             * 위에 있는 투명 버튼이 작동
+                             * iframe이 클릭을 먹지 않게 함
+                             * 모든 클릭은 부모 <a>가 처리
                              */
                             pointerEvents: "none"
                           }}
@@ -667,7 +667,9 @@ export default function HomePage() {
 
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center"
+                            justifyContent: "center",
+
+                            pointerEvents: "none"
                           }}
                         >
 
@@ -677,14 +679,13 @@ export default function HomePage() {
 
                       )}
 
-                      {/* ==================================
-                          LIVE 표시
-                      ================================== */}
+                      {/* LIVE 표시 */}
 
                       <span
                         className="live-dot"
                         style={{
                           position: "absolute",
+
                           top: 8,
                           left: 8,
 
@@ -700,44 +701,6 @@ export default function HomePage() {
 
                       </span>
 
-                      {/* ==================================
-                          전체 클릭 영역
-
-                          재생 X
-                          클릭 → YouTube LIVE 이동
-                      ================================== */}
-
-                      {liveUrl && (
-
-                        <button
-                          type="button"
-                          aria-label={`${item.name} 라이브 보러가기`}
-                          onClick={() =>
-                            openLive(item)
-                          }
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-
-                            zIndex: 10,
-
-                            width: "100%",
-                            height: "100%",
-
-                            margin: 0,
-                            padding: 0,
-
-                            border: 0,
-                            outline: 0,
-
-                            background: "transparent",
-
-                            cursor: "pointer"
-                          }}
-                        />
-
-                      )}
-
                     </div>
 
                     {/* ====================================
@@ -746,14 +709,12 @@ export default function HomePage() {
 
                     <div
                       className="live-mini-info"
-                      onClick={() =>
-                        openLive(item)
-                      }
                       style={{
-                        cursor:
-                          liveUrl
-                            ? "pointer"
-                            : "default"
+                        /*
+                         * 이 부분도 부모 링크가
+                         * 클릭을 받게 함
+                         */
+                        pointerEvents: "none"
                       }}
                     >
 
@@ -800,7 +761,7 @@ export default function HomePage() {
 
                     </div>
 
-                  </article>
+                  </a>
 
                 );
 
@@ -906,9 +867,7 @@ export default function HomePage() {
                     ) : (
 
                       <div className="live-thumb-placeholder">
-
                         <Youtube size={28} />
-
                       </div>
 
                     )}
@@ -1010,8 +969,13 @@ export default function HomePage() {
                     {item.thumbnail ? (
 
                       <img
-                        src={item.thumbnail}
-                        alt={item.title || ""}
+                        src={
+                          item.thumbnail
+                        }
+                        alt={
+                          item.title ||
+                          ""
+                        }
                       />
 
                     ) : (
@@ -1047,4 +1011,5 @@ export default function HomePage() {
     </main>
 
   );
+
 }
