@@ -372,7 +372,40 @@ function MemberCard({
           직급 + 이름
       ================================================== */}
 
-      <div className="member-title-row">
+      <div
+        className="member-title-row"
+        onClick={openYoutubeChannel}
+        role={
+          member.youtube_url || member.channel_url
+            ? "link"
+            : undefined
+        }
+        tabIndex={
+          member.youtube_url || member.channel_url
+            ? 0
+            : undefined
+        }
+        onKeyDown={(event) => {
+          if (
+            event.key === "Enter" &&
+            (member.youtube_url || member.channel_url)
+          ) {
+            openYoutubeChannel();
+          }
+        }}
+        title={
+          member.youtube_url || member.channel_url
+            ? `${member.name} YouTube 채널로 이동`
+            : undefined
+        }
+        style={{
+          cursor:
+            member.youtube_url || member.channel_url
+              ? "pointer"
+              : "default",
+          userSelect: "none"
+        }}
+      >
 
         <span className="role-badge">
 
