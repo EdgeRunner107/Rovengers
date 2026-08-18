@@ -19,9 +19,6 @@ const API_BASE_URL =
 
 // ======================================================
 // 직급 순서
-//
-// API에서도 role_order로 정렬하지만
-// React에서도 한 번 더 보장
 // ======================================================
 
 const ROLE_ORDER = {
@@ -47,10 +44,6 @@ function ImageModal({
   modal,
   onClose
 }) {
-
-  // ====================================================
-  // ESC 키로 닫기
-  // ====================================================
 
   useEffect(() => {
 
@@ -125,10 +118,6 @@ function ImageModal({
         }
       >
 
-        {/* ==============================================
-            팝업 상단
-        ============================================== */}
-
         <div className="member-image-modal-head">
 
           <div>
@@ -161,10 +150,6 @@ function ImageModal({
 
         </div>
 
-
-        {/* ==============================================
-            이미지
-        ============================================== */}
 
         <div className="member-image-modal-body">
 
@@ -235,7 +220,9 @@ function MemberCard({
       !member.is_live ||
       !member.live_url
     ) {
+
       return;
+
     }
 
 
@@ -250,8 +237,6 @@ function MemberCard({
 
   // ====================================================
   // YouTube 채널 열기
-  //
-  // 프로필 사진 클릭 시 이동
   // ====================================================
 
   const openYoutubeChannel = () => {
@@ -291,12 +276,16 @@ function MemberCard({
                 : "member-card"
             )
       }
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0,
+        boxSizing: "border-box"
+      }}
     >
 
       {/* ==================================================
           멤버 YouTube 프로필 이미지
-
-          클릭하면 각자의 YouTube 채널 이동
       ================================================== */}
 
       <div
@@ -349,9 +338,6 @@ function MemberCard({
 
         {/* ==================================================
             LIVE 배지
-
-            배지 클릭은 YouTube 채널이 아니라
-            현재 LIVE 방송으로 이동
         ================================================== */}
 
         {member.is_live && (
@@ -361,7 +347,6 @@ function MemberCard({
             className="member-live-badge"
             onClick={(event) => {
 
-              // 부모 프로필 클릭 방지
               event.stopPropagation();
 
               openLive();
@@ -557,12 +542,68 @@ export default function MemberPage() {
 
 
   // ====================================================
+  // 모바일 여부
+  // 680px 이하 = 1열
+  // ====================================================
+
+  const [
+    isMobile,
+    setIsMobile
+  ] = useState(() => {
+
+    if (
+      typeof window === "undefined"
+    ) {
+
+      return false;
+
+    }
+
+    return (
+      window.innerWidth <= 680
+    );
+
+  });
+
+
+  // ====================================================
+  // 화면 크기 감지
+  // ====================================================
+
+  useEffect(() => {
+
+    const handleResize = () => {
+
+      setIsMobile(
+        window.innerWidth <= 680
+      );
+
+    };
+
+
+    handleResize();
+
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+
+    };
+
+  }, []);
+
+
+  // ====================================================
   // 멤버 API 조회
-  //
-  // GET /members-page
-  //
-  // 멤버 정보 +
-  // LIVE 상태까지 포함
   // ====================================================
 
   const loadMembers =
@@ -752,7 +793,15 @@ export default function MemberPage() {
 
     return (
 
-      <main className="members-page">
+      <main
+        className="members-page"
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
+          overflowX: "hidden"
+        }}
+      >
 
         <div className="members-loading">
 
@@ -775,7 +824,15 @@ export default function MemberPage() {
 
     return (
 
-      <main className="members-page">
+      <main
+        className="members-page"
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
+          overflowX: "hidden"
+        }}
+      >
 
         <div className="members-error">
 
@@ -817,7 +874,15 @@ export default function MemberPage() {
 
     <>
 
-      <main className="members-page">
+      <main
+        className="members-page"
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
+          overflowX: "hidden"
+        }}
+      >
 
 
         {/* ==================================================
@@ -828,12 +893,7 @@ export default function MemberPage() {
 
           <div />
 
-
           <div className="member-count">
-
-          
-
-            
 
           </div>
 
@@ -842,21 +902,37 @@ export default function MemberPage() {
 
         {/* ==================================================
             대표
-
-            대표는 프로필/공약/시그 버튼 없음
         ================================================== */}
 
         {leader && (
 
-          <section className="leader-section">
+          <section
+            className="leader-section"
+            style={{
+              width: "100%",
+              maxWidth: "100%",
+              boxSizing: "border-box"
+            }}
+          >
 
-            <MemberCard
-              member={leader}
-              leader
-              onImageOpen={
-                setModal
-              }
-            />
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "300px",
+                minWidth: 0,
+                margin: "0 auto"
+              }}
+            >
+
+              <MemberCard
+                member={leader}
+                leader
+                onImageOpen={
+                  setModal
+                }
+              />
+
+            </div>
 
           </section>
 
@@ -867,7 +943,15 @@ export default function MemberPage() {
             나머지 멤버
         ================================================== */}
 
-        <section className="team-section">
+        <section
+          className="team-section"
+          style={{
+            width: "100%",
+            maxWidth: "100%",
+            minWidth: 0,
+            boxSizing: "border-box"
+          }}
+        >
 
           <div className="team-divider">
 
@@ -890,22 +974,73 @@ export default function MemberPage() {
           </div>
 
 
-          <div className="member-grid">
+          {/* ==================================================
+              멤버 GRID
+
+              데스크탑 = 4열
+              모바일 680px 이하 = 1열
+          ================================================== */}
+
+          <div
+            className="member-grid"
+            style={{
+              display: "grid",
+
+              gridTemplateColumns:
+                isMobile
+                  ? "minmax(0, 1fr)"
+                  : "repeat(4, minmax(0, 1fr))",
+
+              gap:
+                isMobile
+                  ? "14px"
+                  : "20px",
+
+              width: "100%",
+
+              maxWidth:
+                isMobile
+                  ? "100%"
+                  : "1180px",
+
+              margin:
+                "0 auto",
+
+              minWidth: 0,
+
+              boxSizing:
+                "border-box",
+
+              overflow:
+                "hidden"
+            }}
+          >
 
             {crewMembers.map(
               member => (
 
-                <MemberCard
+                <div
                   key={
                     member.id
                   }
-                  member={
-                    member
-                  }
-                  onImageOpen={
-                    setModal
-                  }
-                />
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    minWidth: 0,
+                    boxSizing: "border-box"
+                  }}
+                >
+
+                  <MemberCard
+                    member={
+                      member
+                    }
+                    onImageOpen={
+                      setModal
+                    }
+                  />
+
+                </div>
 
               )
             )}
