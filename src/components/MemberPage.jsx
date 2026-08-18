@@ -236,28 +236,45 @@ function MemberCard({
 
 
   // ====================================================
-  // YouTube 채널 열기
+  // YouTube 채널 주소
+  //
+  // 배포 환경에서 youtube_url/channel_url이 없어도
+  // channel id가 있으면 직접 주소 생성
   // ====================================================
 
-  const openYoutubeChannel = () => {
+  const getYoutubeChannelUrl = () => {
 
-    const youtubeUrl =
-      member.youtube_url ||
-      member.channel_url;
+    if (member.youtube_url) {
+      return member.youtube_url;
+    }
 
-
-    if (!youtubeUrl) {
-      return;
+    if (member.channel_url) {
+      return member.channel_url;
     }
 
 
-    window.open(
-      youtubeUrl,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    const channelId =
+      member.youtube_channel_id ||
+      member.channel_id;
+
+
+    if (channelId) {
+
+      return (
+        `https://www.youtube.com/channel/` +
+        `${channelId}`
+      );
+
+    }
+
+
+    return null;
 
   };
+
+
+  const youtubeChannelUrl =
+    getYoutubeChannelUrl();
 
 
   return (
@@ -294,23 +311,48 @@ function MemberCard({
             ? "member-photo-wrap member-photo-live"
             : "member-photo-wrap"
         }
-        onClick={
-          openYoutubeChannel
-        }
-        title={
-          member.youtube_url ||
-          member.channel_url
-            ? `${member.name} YouTube 채널`
-            : undefined
-        }
         style={{
-          cursor:
-            member.youtube_url ||
-            member.channel_url
-              ? "pointer"
-              : "default"
+          position: "relative"
         }}
       >
+
+        {/* ==================================================
+            프로필 전체 클릭 링크
+
+            JS onClick이 아니라 실제 a 태그이므로
+            Vercel 배포 환경에서도 안정적으로 작동
+        ================================================== */}
+
+        {youtubeChannelUrl && (
+
+          <a
+            href={
+              youtubeChannelUrl
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            title={
+              `${member.name} YouTube 채널`
+            }
+            aria-label={
+              `${member.name} YouTube 채널로 이동`
+            }
+            style={{
+              position: "absolute",
+              inset: 0,
+
+              zIndex: 2,
+
+              display: "block",
+
+              cursor: "pointer",
+
+              textDecoration: "none"
+            }}
+          />
+
+        )}
+
 
         {member.youtube_profile_image ? (
 
@@ -345,6 +387,12 @@ function MemberCard({
           <button
             type="button"
             className="member-live-badge"
+
+            style={{
+              position: "relative",
+              zIndex: 3
+            }}
+
             onClick={(event) => {
 
               event.stopPropagation();
@@ -352,6 +400,7 @@ function MemberCard({
               openLive();
 
             }}
+
             title="라이브 방송 보기"
           >
 
@@ -370,57 +419,81 @@ function MemberCard({
 
       {/* ==================================================
           직급 + 이름
+
+          이름 영역 자체를 실제 링크로 변경
       ================================================== */}
 
-      <div
-        className="member-title-row"
-        onClick={openYoutubeChannel}
-        role={
-          member.youtube_url || member.channel_url
-            ? "link"
-            : undefined
-        }
-        tabIndex={
-          member.youtube_url || member.channel_url
-            ? 0
-            : undefined
-        }
-        onKeyDown={(event) => {
-          if (
-            event.key === "Enter" &&
-            (member.youtube_url || member.channel_url)
-          ) {
-            openYoutubeChannel();
+      {youtubeChannelUrl ? (
+
+        <a
+          className="member-title-row"
+
+          href={
+            youtubeChannelUrl
           }
-        }}
-        title={
-          member.youtube_url || member.channel_url
-            ? `${member.name} YouTube 채널로 이동`
-            : undefined
-        }
-        style={{
-          cursor:
-            member.youtube_url || member.channel_url
-              ? "pointer"
-              : "default",
-          userSelect: "none"
-        }}
-      >
 
-        <span className="role-badge">
+          target="_blank"
 
-          {member.role}
+          rel="noopener noreferrer"
 
-        </span>
+          title={
+            `${member.name} YouTube 채널로 이동`
+          }
+
+          style={{
+            cursor: "pointer",
+
+            userSelect: "none",
+
+            textDecoration: "none",
+
+            color: "inherit"
+          }}
+        >
+
+          <span className="role-badge">
+
+            {member.role}
+
+          </span>
 
 
-        <strong>
+          <strong>
 
-          {member.name}
+            {member.name}
 
-        </strong>
+          </strong>
 
-      </div>
+        </a>
+
+      ) : (
+
+        <div
+          className="member-title-row"
+
+          style={{
+            cursor: "default",
+
+            userSelect: "none"
+          }}
+        >
+
+          <span className="role-badge">
+
+            {member.role}
+
+          </span>
+
+
+          <strong>
+
+            {member.name}
+
+          </strong>
+
+        </div>
+
+      )}
 
 
       {/* ==================================================
@@ -464,9 +537,11 @@ function MemberCard({
 
           <button
             type="button"
+
             disabled={
               !member.member_profile_image
             }
+
             onClick={() =>
               openImage(
                 "프로필",
@@ -486,9 +561,11 @@ function MemberCard({
 
           <button
             type="button"
+
             disabled={
               !member.promise_image
             }
+
             onClick={() =>
               openImage(
                 "공약",
@@ -508,9 +585,11 @@ function MemberCard({
 
           <button
             type="button"
+
             disabled={
               !member.signature_image
             }
+
             onClick={() =>
               openImage(
                 "시그니처",
@@ -591,6 +670,7 @@ export default function MemberPage() {
       return false;
 
     }
+
 
     return (
       window.innerWidth <= 680
@@ -828,10 +908,14 @@ export default function MemberPage() {
 
       <main
         className="members-page"
+
         style={{
           width: "100%",
+
           maxWidth: "100%",
+
           boxSizing: "border-box",
+
           overflowX: "hidden"
         }}
       >
@@ -859,10 +943,14 @@ export default function MemberPage() {
 
       <main
         className="members-page"
+
         style={{
           width: "100%",
+
           maxWidth: "100%",
+
           boxSizing: "border-box",
+
           overflowX: "hidden"
         }}
       >
@@ -870,12 +958,16 @@ export default function MemberPage() {
         <div className="members-error">
 
           <strong>
+
             멤버 정보를 불러오지 못했습니다.
+
           </strong>
 
 
           <p>
+
             {error}
+
           </p>
 
 
@@ -909,10 +1001,14 @@ export default function MemberPage() {
 
       <main
         className="members-page"
+
         style={{
           width: "100%",
+
           maxWidth: "100%",
+
           boxSizing: "border-box",
+
           overflowX: "hidden"
         }}
       >
@@ -941,9 +1037,12 @@ export default function MemberPage() {
 
           <section
             className="leader-section"
+
             style={{
               width: "100%",
+
               maxWidth: "100%",
+
               boxSizing: "border-box"
             }}
           >
@@ -951,15 +1050,20 @@ export default function MemberPage() {
             <div
               style={{
                 width: "100%",
+
                 maxWidth: "300px",
+
                 minWidth: 0,
+
                 margin: "0 auto"
               }}
             >
 
               <MemberCard
                 member={leader}
+
                 leader
+
                 onImageOpen={
                   setModal
                 }
@@ -978,10 +1082,14 @@ export default function MemberPage() {
 
         <section
           className="team-section"
+
           style={{
             width: "100%",
+
             maxWidth: "100%",
+
             minWidth: 0,
+
             boxSizing: "border-box"
           }}
         >
@@ -996,7 +1104,9 @@ export default function MemberPage() {
               ROVENGERS{" "}
 
               <b>
+
                 {crewMembers.length}명
+
               </b>
 
             </h2>
@@ -1016,6 +1126,7 @@ export default function MemberPage() {
 
           <div
             className="member-grid"
+
             style={{
               display: "grid",
 
@@ -1056,10 +1167,14 @@ export default function MemberPage() {
                   key={
                     member.id
                   }
+
                   style={{
                     width: "100%",
+
                     maxWidth: "100%",
+
                     minWidth: 0,
+
                     boxSizing: "border-box"
                   }}
                 >
@@ -1068,6 +1183,7 @@ export default function MemberPage() {
                     member={
                       member
                     }
+
                     onImageOpen={
                       setModal
                     }
@@ -1106,6 +1222,7 @@ export default function MemberPage() {
 
       <ImageModal
         modal={modal}
+
         onClose={() =>
           setModal(null)
         }
