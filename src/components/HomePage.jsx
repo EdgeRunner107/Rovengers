@@ -6,18 +6,11 @@ import {
   Youtube
 } from "lucide-react";
 
-
 // ======================================================
 // 백엔드 API 주소
-//
-// 로컬 개발:
-// http://localhost:8888
-//
-// Render 배포 후에는 이 주소만 변경
 // ======================================================
 
 const API_BASE_URL = "https://asg-b2.onrender.com";
-
 
 // ======================================================
 // 섹션 제목
@@ -28,21 +21,11 @@ function SectionHead({
   title,
   right
 }) {
-
   return (
-
     <div className="onepage-section-head">
-
       <div>
-
-        <span>
-          {eyebrow}
-        </span>
-
-        <h2>
-          {title}
-        </h2>
-
+        <span>{eyebrow}</span>
+        <h2>{title}</h2>
       </div>
 
       {right && (
@@ -50,13 +33,9 @@ function SectionHead({
           {right}
         </button>
       )}
-
     </div>
-
   );
-
 }
-
 
 // ======================================================
 // HomePage
@@ -65,82 +44,42 @@ function SectionHead({
 export default function HomePage() {
 
   // ====================================================
-  // 실제 YouTube 게시물
-  //
-  // mockData 사용하지 않음
+  // YouTube 게시물
   // ====================================================
 
-  const [
-    youtubePosts,
-    setYoutubePosts
-  ] = useState([]);
-
-
-  const [
-    postsLoading,
-    setPostsLoading
-  ] = useState(true);
-
-
-  const [
-    postsError,
-    setPostsError
-  ] = useState(null);
-
-
-  // ====================================================
-  // YouTube 게시물 조회
-  //
-  // GET /youtube/community-posts
-  //
-  // YouTube 직접 조회 X
-  // Supabase youtube_posts만 조회
-  // ====================================================
+  const [youtubePosts, setYoutubePosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState(null);
 
   const loadYoutubePosts = async () => {
-
     try {
-
       setPostsLoading(true);
-
       setPostsError(null);
 
-
-      const response =
-        await fetch(
-          `${API_BASE_URL}/youtube/community-posts?limit=20`
-        );
-
+      const response = await fetch(
+        `${API_BASE_URL}/youtube/community-posts?limit=20`
+      );
 
       if (!response.ok) {
-
         throw new Error(
           `게시글 요청 실패 (${response.status})`
         );
-
       }
 
-
-      const result =
-        await response.json();
-
+      const result = await response.json();
 
       if (!result.success) {
-
         throw new Error(
           result.error ||
           "게시글을 불러오지 못했습니다."
         );
-
       }
-
 
       setYoutubePosts(
         Array.isArray(result.data)
           ? result.data
           : []
       );
-
 
     } catch (error) {
 
@@ -149,131 +88,59 @@ export default function HomePage() {
         error
       );
 
-
-      setPostsError(
-        error.message
-      );
-
-
+      setPostsError(error.message);
       setYoutubePosts([]);
-
 
     } finally {
 
       setPostsLoading(false);
 
     }
-
   };
-
-
-  // ====================================================
-  // 홈페이지 최초 진입 시 게시글 조회
-  // ====================================================
 
   useEffect(() => {
-
     loadYoutubePosts();
-
   }, []);
 
-
   // ====================================================
-  // 게시글 클릭
-  // ====================================================
-
-  const openYoutubePost = (
-    url
-  ) => {
-
-    if (!url) {
-      return;
-    }
-
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-  };
-
-
-  // ====================================================
-  // 실제 LIVE 멤버
-  //
-  // mockData 사용하지 않음
+  // LIVE
   // ====================================================
 
-  const [
-    liveMembers,
-    setLiveMembers
-  ] = useState([]);
-
-
-  const [
-    liveLoading,
-    setLiveLoading
-  ] = useState(true);
-
-
-  const [
-    liveError,
-    setLiveError
-  ] = useState(null);
-
-
-  // ====================================================
-  // LIVE 멤버 조회
-  //
-  // GET /youtube/live-members
-  // ====================================================
+  const [liveMembers, setLiveMembers] = useState([]);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [liveError, setLiveError] = useState(null);
 
   const loadLiveMembers = async () => {
 
     try {
 
       setLiveLoading(true);
-
       setLiveError(null);
 
-
-      const response =
-        await fetch(
-          `${API_BASE_URL}/youtube/live-members`
-        );
-
+      const response = await fetch(
+        `${API_BASE_URL}/youtube/live-members`
+      );
 
       if (!response.ok) {
-
         throw new Error(
           `LIVE 목록 요청 실패 (${response.status})`
         );
-
       }
 
-
-      const result =
-        await response.json();
-
+      const result = await response.json();
 
       if (!result.success) {
-
         throw new Error(
           result.error ||
           "LIVE 목록을 불러오지 못했습니다."
         );
-
       }
-
 
       setLiveMembers(
         Array.isArray(result.data)
           ? result.data
           : []
       );
-
 
     } catch (error) {
 
@@ -282,131 +149,132 @@ export default function HomePage() {
         error
       );
 
-
-      setLiveError(
-        error.message
-      );
-
-
+      setLiveError(error.message);
       setLiveMembers([]);
-
 
     } finally {
 
       setLiveLoading(false);
 
     }
-
   };
 
-
-  // ====================================================
-  // 홈페이지 최초 진입 시 LIVE 상태 조회
-  // ====================================================
-
   useEffect(() => {
-
     loadLiveMembers();
-
   }, []);
 
+  // ====================================================
+  // 실제 YouTube 이동 주소
+  // ====================================================
+
+  const getLiveUrl = (item) => {
+
+    if (item.live_url) {
+      return item.live_url;
+    }
+
+    if (item.channel_id) {
+      return `https://www.youtube.com/channel/${item.channel_id}/live`;
+    }
+
+    return null;
+  };
 
   // ====================================================
-  // LIVE 카드 클릭
+  // iframe LIVE 주소
+  //
+  // 재생 목적 X
+  // 화면/썸네일 표시 목적
   // ====================================================
 
-  const openLive = (
-    url
-  ) => {
+  const getLiveEmbedUrl = (item) => {
+
+    if (!item.channel_id) {
+      return null;
+    }
+
+    const origin =
+      typeof window !== "undefined"
+        ? encodeURIComponent(
+            window.location.origin
+          )
+        : "";
+
+    return (
+      `https://www.youtube.com/embed/live_stream` +
+      `?channel=${item.channel_id}` +
+      `&autoplay=0` +
+      `&mute=1` +
+      `&controls=0` +
+      `&playsinline=1` +
+      `&rel=0` +
+      `&modestbranding=1` +
+      `&disablekb=1` +
+      (origin
+        ? `&origin=${origin}`
+        : "")
+    );
+  };
+
+  // ====================================================
+  // LIVE 페이지 이동
+  // ====================================================
+
+  const openLive = (item) => {
+
+    const url =
+      getLiveUrl(item);
 
     if (!url) {
       return;
     }
-
 
     window.open(
       url,
       "_blank",
       "noopener,noreferrer"
     );
-
   };
 
-
   // ====================================================
-  // 실제 YouTube Shorts
-  //
-  // mockData 사용하지 않음
+  // Shorts
   // ====================================================
 
-  const [
-    shorts,
-    setShorts
-  ] = useState([]);
-
-
-  const [
-    shortsLoading,
-    setShortsLoading
-  ] = useState(true);
-
-
-  const [
-    shortsError,
-    setShortsError
-  ] = useState(null);
-
-
-  // ====================================================
-  // Shorts 조회
-  //
-  // GET /youtube/shorts-list
-  // ====================================================
+  const [shorts, setShorts] = useState([]);
+  const [shortsLoading, setShortsLoading] = useState(true);
+  const [shortsError, setShortsError] = useState(null);
 
   const loadShorts = async () => {
 
     try {
 
       setShortsLoading(true);
-
       setShortsError(null);
 
-
-      const response =
-        await fetch(
-          `${API_BASE_URL}/youtube/shorts-list?limit=20`
-        );
-
+      const response = await fetch(
+        `${API_BASE_URL}/youtube/shorts-list?limit=20`
+      );
 
       if (!response.ok) {
-
         throw new Error(
           `Shorts 목록 요청 실패 (${response.status})`
         );
-
       }
 
-
-      const result =
-        await response.json();
-
+      const result = await response.json();
 
       if (!result.success) {
-
         throw new Error(
           result.error ||
           "Shorts 목록을 불러오지 못했습니다."
         );
-
       }
-
 
       setShorts(
         Array.isArray(result.data)
           ? result.data
           : []
       );
-
 
     } catch (error) {
 
@@ -415,131 +283,59 @@ export default function HomePage() {
         error
       );
 
-
-      setShortsError(
-        error.message
-      );
-
-
+      setShortsError(error.message);
       setShorts([]);
-
 
     } finally {
 
       setShortsLoading(false);
 
     }
-
   };
-
-
-  // ====================================================
-  // 홈페이지 최초 진입 시 Shorts 조회
-  // ====================================================
 
   useEffect(() => {
-
     loadShorts();
-
   }, []);
 
-
   // ====================================================
-  // Shorts 카드 클릭
-  // ====================================================
-
-  const openShort = (
-    url
-  ) => {
-
-    if (!url) {
-      return;
-    }
-
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-  };
-
-
-  // ====================================================
-  // 실제 YouTube 다시보기
-  //
-  // mockData 사용하지 않음
+  // 다시보기
   // ====================================================
 
-  const [
-    videos,
-    setVideos
-  ] = useState([]);
-
-
-  const [
-    videosLoading,
-    setVideosLoading
-  ] = useState(true);
-
-
-  const [
-    videosError,
-    setVideosError
-  ] = useState(null);
-
-
-  // ====================================================
-  // YouTube 다시보기 조회
-  //
-  // GET /youtube/videos-list
-  // ====================================================
+  const [videos, setVideos] = useState([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [videosError, setVideosError] = useState(null);
 
   const loadVideos = async () => {
 
     try {
 
       setVideosLoading(true);
-
       setVideosError(null);
 
-
-      const response =
-        await fetch(
-          `${API_BASE_URL}/youtube/videos-list?limit=20`
-        );
-
+      const response = await fetch(
+        `${API_BASE_URL}/youtube/videos-list?limit=20`
+      );
 
       if (!response.ok) {
-
         throw new Error(
           `영상 목록 요청 실패 (${response.status})`
         );
-
       }
 
-
-      const result =
-        await response.json();
-
+      const result = await response.json();
 
       if (!result.success) {
-
         throw new Error(
           result.error ||
           "영상 목록을 불러오지 못했습니다."
         );
-
       }
-
 
       setVideos(
         Array.isArray(result.data)
           ? result.data
           : []
       );
-
 
     } catch (error) {
 
@@ -548,56 +344,19 @@ export default function HomePage() {
         error
       );
 
-
-      setVideosError(
-        error.message
-      );
-
-
+      setVideosError(error.message);
       setVideos([]);
-
 
     } finally {
 
       setVideosLoading(false);
 
     }
-
   };
-
-
-  // ====================================================
-  // 홈페이지 최초 진입 시 다시보기 조회
-  // ====================================================
 
   useEffect(() => {
-
     loadVideos();
-
   }, []);
-
-
-  // ====================================================
-  // 다시보기 카드 클릭
-  // ====================================================
-
-  const openVideo = (
-    url
-  ) => {
-
-    if (!url) {
-      return;
-    }
-
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-  };
-
 
   // ====================================================
   // 화면
@@ -607,11 +366,8 @@ export default function HomePage() {
 
     <main className="onepage-shell">
 
-
       {/* ==================================================
           유튜브 게시물
-
-          ★ 실제 DB API 연결
       ================================================== */}
 
       <section className="onepage-section">
@@ -619,21 +375,15 @@ export default function HomePage() {
         <SectionHead
           eyebrow="POST"
           title="유튜브 공지"
-      
-        
         />
-
 
         {postsLoading && (
 
           <div className="post-empty">
-
             유튜브 게시물을 불러오는 중입니다.
-
           </div>
 
         )}
-
 
         {!postsLoading &&
           postsError && (
@@ -644,20 +394,15 @@ export default function HomePage() {
                 게시물을 불러오지 못했습니다.
               </p>
 
-
               <small>
                 {postsError}
               </small>
 
-
               <br />
-
 
               <button
                 type="button"
-                onClick={
-                  loadYoutubePosts
-                }
+                onClick={loadYoutubePosts}
               >
                 다시 불러오기
               </button>
@@ -666,144 +411,104 @@ export default function HomePage() {
 
           )}
 
-
-        {!postsLoading &&
-          !postsError &&
-          youtubePosts.length === 0 && (
-
-            <div className="post-empty">
-
-              아직 등록된 유튜브 게시물이 없습니다.
-
-            </div>
-
-          )}
-
-
         {!postsLoading &&
           !postsError &&
           youtubePosts.length > 0 && (
 
             <div className="notice-row">
 
-              {youtubePosts.map(
-                (post) => (
+              {youtubePosts.map((post) => (
 
-                  <a
-                    className="notice-mini-card"
-                    key={
-                      post.post_id ||
-                      post.id
-                    }
-                    href={post.post_url || undefined}
-                    target={post.post_url ? "_blank" : undefined}
-                    rel={post.post_url ? "noopener noreferrer" : undefined}
-                    style={{
-                      cursor: post.post_url ? "pointer" : "default",
-                      textDecoration: "none",
-                      color: "inherit"
-                    }}
-                  >
+                <a
+                  className="notice-mini-card"
+                  key={
+                    post.post_id ||
+                    post.id
+                  }
+                  href={
+                    post.post_url ||
+                    undefined
+                  }
+                  target={
+                    post.post_url
+                      ? "_blank"
+                      : undefined
+                  }
+                  rel={
+                    post.post_url
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit"
+                  }}
+                >
 
-                    <div className="notice-mini-top">
+                  <div className="notice-mini-top">
 
-                      <span className="yt-icon">
+                    <span className="yt-icon">
+                      <Youtube size={14} />
+                    </span>
 
-                        <Youtube
-                          size={14}
-                        />
+                    <strong>
+                      {post.member_name || "멤버"}
+                    </strong>
 
-                      </span>
+                    <small>
+                      {post.published_text || ""}
+                    </small>
 
+                    <b>
+                      NEW
+                    </b>
 
-                      <strong>
+                  </div>
 
-                        {post.member_name ||
-                          "멤버"}
+                  <div className="notice-mini-body">
 
-                      </strong>
+                    <div>
 
+                      <p
+                        style={{
+                          whiteSpace: "pre-line",
+                          textDecoration: "none",
+                          color: "inherit"
+                        }}
+                      >
+                        {post.text}
+                      </p>
 
-                      <small>
+                      <div className="notice-mini-stats">
 
-                        {post.published_text ||
-                          ""}
+                        <span>
+                          <Heart size={13} />{" "}
+                          {post.likes || "0"}
+                        </span>
 
-                      </small>
-
-
-                      <b>
-                        NEW
-                      </b>
-
-                    </div>
-
-
-                    <div className="notice-mini-body">
-
-                      <div>
-
-                        <p
-                          style={{
-                            whiteSpace:
-                              "pre-line"
-                          }}
-                        >
-
-                          {post.text}
-
-                        </p>
-
-
-                        <div className="notice-mini-stats">
-
-                          <span>
-
-                            <Heart
-                              size={13}
-                            />
-
-                            {" "}
-
-                            {post.likes ||
-                              "0"}
-
-                          </span>
-
-
-                          <span>
-
-                            <MessageCircle
-                              size={13}
-                            />
-
-                            {" "}
-
-                            {post.comments ||
-                              "0"}
-
-                          </span>
-
-                        </div>
+                        <span>
+                          <MessageCircle size={13} />{" "}
+                          {post.comments || "0"}
+                        </span>
 
                       </div>
 
-
-                      {post.image && (
-
-                        <img
-                          src={post.image}
-                          alt={`${post.member_name || ""} 게시물`}
-                        />
-
-                      )}
-
                     </div>
 
-                  </a>
+                    {post.image && (
 
-                )
-              )}
+                      <img
+                        src={post.image}
+                        alt={`${post.member_name || ""} 게시물`}
+                      />
+
+                    )}
+
+                  </div>
+
+                </a>
+
+              ))}
 
             </div>
 
@@ -811,18 +516,15 @@ export default function HomePage() {
 
       </section>
 
-
       {/* ==================================================
-          YouTube LIVE
-
-          ★ 실제 DB API 연결
+          LIVE
       ================================================== */}
 
       <section className="onepage-section">
 
         <SectionHead
-          eyebrow="YOUTUBE LIVE "
-          title="LIVE "
+          eyebrow="YOUTUBE LIVE"
+          title="LIVE"
           right={
             liveLoading
               ? "확인 중"
@@ -830,24 +532,17 @@ export default function HomePage() {
           }
         />
 
-
         <p className="section-subline">
-
           라이브 중인 멤버를 확인해 보세요.
-
         </p>
-
 
         {liveLoading && (
 
           <div className="live-empty">
-
             라이브 정보를 불러오는 중입니다.
-
           </div>
 
         )}
-
 
         {!liveLoading &&
           liveError && (
@@ -866,9 +561,7 @@ export default function HomePage() {
 
               <button
                 type="button"
-                onClick={
-                  loadLiveMembers
-                }
+                onClick={loadLiveMembers}
               >
                 다시 불러오기
               </button>
@@ -877,19 +570,15 @@ export default function HomePage() {
 
           )}
 
-
         {!liveLoading &&
           !liveError &&
           liveMembers.length === 0 && (
 
             <div className="live-empty">
-
               현재 방송 중인 멤버가 없습니다.
-
             </div>
 
           )}
-
 
         {!liveLoading &&
           !liveError &&
@@ -897,67 +586,176 @@ export default function HomePage() {
 
             <div className="live-row">
 
-              {liveMembers.map(
-                (item) => (
+              {liveMembers.map((item) => {
 
-                  <a
+                const embedUrl =
+                  getLiveEmbedUrl(item);
+
+                const liveUrl =
+                  getLiveUrl(item);
+
+                return (
+
+                  <article
                     className="live-mini-card"
-                    key={item.id}
-                    href={item.live_url || undefined}
-                    target={item.live_url ? "_blank" : undefined}
-                    rel={item.live_url ? "noopener noreferrer" : undefined}
+                    key={
+                      item.id ||
+                      item.member_id ||
+                      item.channel_id
+                    }
                     style={{
-                      cursor: item.live_url ? "pointer" : "default",
                       textDecoration: "none",
                       color: "inherit"
                     }}
                   >
 
-                    <div className="live-mini-thumb">
+                    {/* ====================================
+                        LIVE iframe 썸네일
+                    ==================================== */}
 
-                      {item.thumbnail ? (
+                    <div
+                      className="live-mini-thumb"
+                      style={{
+                        position: "relative",
+                        width: "100%",
+                        aspectRatio: "16 / 9",
+                        overflow: "hidden",
+                        background: "#000",
+                        cursor:
+                          liveUrl
+                            ? "pointer"
+                            : "default"
+                      }}
+                    >
 
-                        <img
-                          src={
-                            item.thumbnail
-                          }
-                          alt={
-                            `${item.name} 라이브`
-                          }
+                      {embedUrl ? (
+
+                        <iframe
+                          src={embedUrl}
+                          title={`${item.name} LIVE`}
+                          loading="lazy"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+
+                            width: "100%",
+                            height: "100%",
+
+                            border: 0,
+                            display: "block",
+
+                            /*
+                             * iframe 자체는 클릭 불가능
+                             *
+                             * 사용자가 클릭하면
+                             * 위에 있는 투명 버튼이 작동
+                             */
+                            pointerEvents: "none"
+                          }}
                         />
 
                       ) : (
 
-                        <div className="live-thumb-placeholder">
+                        <div
+                          className="live-thumb-placeholder"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
 
-                          <Youtube
-                            size={28}
-                          />
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                        >
+
+                          <Youtube size={28} />
 
                         </div>
 
                       )}
 
+                      {/* ==================================
+                          LIVE 표시
+                      ================================== */}
 
-                      <span className="live-dot">
+                      <span
+                        className="live-dot"
+                        style={{
+                          position: "absolute",
+                          top: 8,
+                          left: 8,
+
+                          zIndex: 5,
+
+                          pointerEvents: "none"
+                        }}
+                      >
 
                         <i />
 
-                        LIVE ·{" "}
-
-                        {Number(
-                          item.viewer_count ||
-                          0
-                        ).toLocaleString(
-                          "ko-KR"
-                        )}
+                        LIVE
 
                       </span>
 
+                      {/* ==================================
+                          전체 클릭 영역
+
+                          재생 X
+                          클릭 → YouTube LIVE 이동
+                      ================================== */}
+
+                      {liveUrl && (
+
+                        <button
+                          type="button"
+                          aria-label={`${item.name} 라이브 보러가기`}
+                          onClick={() =>
+                            openLive(item)
+                          }
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+
+                            zIndex: 10,
+
+                            width: "100%",
+                            height: "100%",
+
+                            margin: 0,
+                            padding: 0,
+
+                            border: 0,
+                            outline: 0,
+
+                            background: "transparent",
+
+                            cursor: "pointer"
+                          }}
+                        />
+
+                      )}
+
                     </div>
 
+                    {/* ====================================
+                        멤버 정보
+                    ==================================== */}
 
-                    <div className="live-mini-info">
+                    <div
+                      className="live-mini-info"
+                      onClick={() =>
+                        openLive(item)
+                      }
+                      style={{
+                        cursor:
+                          liveUrl
+                            ? "pointer"
+                            : "default"
+                      }}
+                    >
 
                       {item.profile_image ? (
 
@@ -982,14 +780,11 @@ export default function HomePage() {
 
                       )}
 
-
                       <div>
 
                         <div className="live-name">
 
-                          <Youtube
-                            size={12}
-                          />
+                          <Youtube size={12} />
 
                           <strong>
                             {item.name}
@@ -997,22 +792,19 @@ export default function HomePage() {
 
                         </div>
 
-
                         <p>
-
-                          {item.title ||
-                            "YouTube LIVE"}
-
+                          YouTube LIVE
                         </p>
 
                       </div>
 
                     </div>
 
-                  </a>
+                  </article>
 
-                )
-              )}
+                );
+
+              })}
 
             </div>
 
@@ -1020,74 +812,33 @@ export default function HomePage() {
 
       </section>
 
-
       {/* ==================================================
-          유튜브 쇼츠
-
-          ★ 실제 DB API 연결
+          쇼츠
       ================================================== */}
 
       <section className="onepage-section">
 
         <SectionHead
           eyebrow="SHORTS"
-          title="NEW "
-         
+          title="NEW"
         />
-
 
         {shortsLoading && (
 
           <div className="live-empty">
-
             쇼츠를 불러오는 중입니다.
-
           </div>
 
         )}
-
 
         {!shortsLoading &&
           shortsError && (
 
             <div className="live-empty">
-
-              <p>
-                쇼츠를 불러오지 못했습니다.
-              </p>
-
-              <small>
-                {shortsError}
-              </small>
-
-              <br />
-
-              <button
-                type="button"
-                onClick={
-                  loadShorts
-                }
-              >
-                다시 불러오기
-              </button>
-
+              쇼츠를 불러오지 못했습니다.
             </div>
 
           )}
-
-
-        {!shortsLoading &&
-          !shortsError &&
-          shorts.length === 0 && (
-
-            <div className="live-empty">
-
-              등록된 쇼츠가 없습니다.
-
-            </div>
-
-          )}
-
 
         {!shortsLoading &&
           !shortsError &&
@@ -1095,70 +846,100 @@ export default function HomePage() {
 
             <div className="shorts-row">
 
-              {shorts.map(
-                (item) => (
+              {shorts.map((item) => (
 
-                  <a
-                    className="short-mini-card"
-                    key={item.id}
-                    href={item.short_url || undefined}
-                    target={item.short_url ? "_blank" : undefined}
-                    rel={item.short_url ? "noopener noreferrer" : undefined}
-                    style={{
-                      cursor: item.short_url ? "pointer" : "default",
-                      textDecoration: "none",
-                      color: "inherit"
-                    }}
-                  >
+                <a
+                  className="short-mini-card"
+                  key={item.id}
 
-                    <div className="short-mini-thumb">
+                  href={
+                    item.short_url ||
+                    undefined
+                  }
 
-                      {item.thumbnail ? (
+                  target={
+                    item.short_url
+                      ? "_blank"
+                      : undefined
+                  }
 
-                        <img
-                          src={
-                            item.thumbnail
-                          }
-                          alt={
-                            item.title || ""
-                          }
-                        />
+                  rel={
+                    item.short_url
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
 
-                      ) : (
+                  style={{
+                    cursor:
+                      item.short_url
+                        ? "pointer"
+                        : "default",
 
-                        <div className="live-thumb-placeholder">
+                    textDecoration:
+                      "none",
 
-                          <Youtube
-                            size={28}
-                          />
+                    color:
+                      "inherit"
+                  }}
+                >
 
-                        </div>
+                  <div className="short-mini-thumb">
 
-                      )}
+                    {item.thumbnail ? (
 
+                      <img
+                        src={
+                          item.thumbnail
+                        }
+                        alt={
+                          item.title ||
+                          "YouTube Shorts"
+                        }
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block"
+                        }}
+                      />
 
-                      <div className="short-mini-overlay" />
+                    ) : (
 
+                      <div className="live-thumb-placeholder">
 
-                      <span className="new-badge">
-                        NEW
-                      </span>
-
-
-                      <div className="short-mini-copy">
-
-                        <p>
-                          {item.title}
-                        </p>
+                        <Youtube size={28} />
 
                       </div>
 
+                    )}
+
+                    <div className="short-mini-overlay" />
+
+                    <span className="new-badge">
+                      NEW
+                    </span>
+
+                    <div className="short-mini-copy">
+
+                      <p
+                        style={{
+                          textDecoration:
+                            "none",
+
+                          color:
+                            "inherit"
+                        }}
+                      >
+                        {item.title}
+                      </p>
+
                     </div>
 
-                  </a>
+                  </div>
 
-                )
-              )}
+                </a>
+
+              ))}
 
             </div>
 
@@ -1166,11 +947,8 @@ export default function HomePage() {
 
       </section>
 
-
       {/* ==================================================
-          유튜브 다시보기
-
-          ★ 실제 DB API 연결
+          다시보기
       ================================================== */}
 
       <section className="onepage-section">
@@ -1178,63 +956,24 @@ export default function HomePage() {
         <SectionHead
           eyebrow="REPLAY"
           title="회차 다시보기"
-         
-        
         />
-
 
         {videosLoading && (
 
           <div className="live-empty">
-
             유튜브 영상을 불러오는 중입니다.
-
           </div>
 
         )}
-
 
         {!videosLoading &&
           videosError && (
 
             <div className="live-empty">
-
-              <p>
-                유튜브 영상을 불러오지 못했습니다.
-              </p>
-
-              <small>
-                {videosError}
-              </small>
-
-              <br />
-
-              <button
-                type="button"
-                onClick={
-                  loadVideos
-                }
-              >
-                다시 불러오기
-              </button>
-
+              유튜브 영상을 불러오지 못했습니다.
             </div>
 
           )}
-
-
-        {!videosLoading &&
-          !videosError &&
-          videos.length === 0 && (
-
-            <div className="live-empty">
-
-              등록된 유튜브 영상이 없습니다.
-
-            </div>
-
-          )}
-
 
         {!videosLoading &&
           !videosError &&
@@ -1242,62 +981,62 @@ export default function HomePage() {
 
             <div className="video-row">
 
-              {videos.map(
-                (item) => (
+              {videos.map((item) => (
 
-                  <a
-                    className="video-mini-card"
-                    key={item.id}
-                    href={item.video_url || undefined}
-                    target={item.video_url ? "_blank" : undefined}
-                    rel={item.video_url ? "noopener noreferrer" : undefined}
-                    style={{
-                      cursor: item.video_url ? "pointer" : "default",
-                      textDecoration: "none",
-                      color: "inherit"
-                    }}
-                  >
+                <a
+                  className="video-mini-card"
+                  key={item.id}
 
-                    <div className="video-mini-thumb">
+                  href={
+                    item.video_url ||
+                    undefined
+                  }
 
-                      {item.thumbnail ? (
+                  target={
+                    item.video_url
+                      ? "_blank"
+                      : undefined
+                  }
 
-                        <img
-                          src={
-                            item.thumbnail
-                          }
-                          alt={
-                            item.title || ""
-                          }
-                        />
+                  rel={
+                    item.video_url
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                >
 
-                      ) : (
+                  <div className="video-mini-thumb">
 
-                        <div className="video-thumb-placeholder">
+                    {item.thumbnail ? (
 
-                          <Youtube
-                            size={28}
-                          />
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title || ""}
+                      />
 
-                        </div>
+                    ) : (
 
-                      )}
+                      <div className="video-thumb-placeholder">
 
-                    </div>
+                        <Youtube size={28} />
 
+                      </div>
 
-                    <div className="video-mini-info">
+                    )}
 
-                      <p>
-                        {item.title}
-                      </p>
+                  </div>
 
-                    </div>
+                  <div className="video-mini-info">
 
-                  </a>
+                    <p>
+                      {item.title}
+                    </p>
 
-                )
-              )}
+                  </div>
+
+                </a>
+
+              ))}
 
             </div>
 
@@ -1305,16 +1044,7 @@ export default function HomePage() {
 
       </section>
 
-
-      {/* ==================================================
-          점수 추이
-
-          기존 그대로
-      ================================================== */}
-
-   
     </main>
 
   );
-
 }
