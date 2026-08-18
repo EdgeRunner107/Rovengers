@@ -1,0 +1,950 @@
+import React, {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  X,
+  Radio
+} from "lucide-react";
+
+
+// ======================================================
+// 백엔드 API 주소
+// ======================================================
+
+const API_BASE_URL =
+  "https://asg-b2.onrender.com";
+
+
+// ======================================================
+// 직급 순서
+//
+// API에서도 role_order로 정렬하지만
+// React에서도 한 번 더 보장
+// ======================================================
+
+const ROLE_ORDER = {
+
+  "대표": 1,
+  "부장": 2,
+  "차장": 3,
+  "과장": 4,
+  "팀장": 5,
+  "대리": 6,
+  "주임": 7,
+  "사원": 8,
+  "인턴": 9
+
+};
+
+
+// ======================================================
+// 이미지 팝업
+// ======================================================
+
+function ImageModal({
+  modal,
+  onClose
+}) {
+
+  // ====================================================
+  // ESC 키로 닫기
+  // ====================================================
+
+  useEffect(() => {
+
+    if (!modal) {
+      return;
+    }
+
+
+    const handleKeyDown =
+      (event) => {
+
+        if (
+          event.key === "Escape"
+        ) {
+
+          onClose();
+
+        }
+
+      };
+
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+
+    document.body.style.overflow =
+      "hidden";
+
+
+    return () => {
+
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+
+      document.body.style.overflow =
+        previousOverflow;
+
+    };
+
+  }, [
+    modal,
+    onClose
+  ]);
+
+
+  if (!modal) {
+    return null;
+  }
+
+
+  return (
+
+    <div
+      className="member-image-modal"
+      onClick={onClose}
+    >
+
+      <div
+        className="member-image-modal-content"
+        onClick={(event) =>
+          event.stopPropagation()
+        }
+      >
+
+        {/* ==============================================
+            팝업 상단
+        ============================================== */}
+
+        <div className="member-image-modal-head">
+
+          <div>
+
+            <span>
+              {modal.role}
+            </span>
+
+            <strong>
+              {modal.memberName}
+            </strong>
+
+            <b>
+              {modal.title}
+            </b>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="member-image-modal-close"
+            onClick={onClose}
+            aria-label="닫기"
+          >
+
+            <X size={22} />
+
+          </button>
+
+        </div>
+
+
+        {/* ==============================================
+            이미지
+        ============================================== */}
+
+        <div className="member-image-modal-body">
+
+          <img
+            src={modal.image}
+            alt={`${modal.memberName} ${modal.title}`}
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+
+// ======================================================
+// 멤버 카드
+// ======================================================
+
+function MemberCard({
+  member,
+  leader = false,
+  onImageOpen
+}) {
+
+  // ====================================================
+  // 이미지 팝업 열기
+  // ====================================================
+
+  const openImage = (
+    title,
+    image
+  ) => {
+
+    if (!image) {
+      return;
+    }
+
+
+    onImageOpen({
+
+      title,
+
+      image,
+
+      memberName:
+        member.name,
+
+      role:
+        member.role
+
+    });
+
+  };
+
+
+  // ====================================================
+  // LIVE 방송 열기
+  // ====================================================
+
+  const openLive = () => {
+
+    if (
+      !member.is_live ||
+      !member.live_url
+    ) {
+      return;
+    }
+
+
+    window.open(
+      member.live_url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  };
+
+
+  // ====================================================
+  // YouTube 채널 열기
+  //
+  // 프로필 사진 클릭 시 이동
+  // ====================================================
+
+  const openYoutubeChannel = () => {
+
+    const youtubeUrl =
+      member.youtube_url ||
+      member.channel_url;
+
+
+    if (!youtubeUrl) {
+      return;
+    }
+
+
+    window.open(
+      youtubeUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  };
+
+
+  return (
+
+    <article
+      className={
+        leader
+          ? (
+              member.is_live
+                ? "member-card leader-card live-member-card"
+                : "member-card leader-card"
+            )
+          : (
+              member.is_live
+                ? "member-card live-member-card"
+                : "member-card"
+            )
+      }
+    >
+
+      {/* ==================================================
+          멤버 YouTube 프로필 이미지
+
+          클릭하면 각자의 YouTube 채널 이동
+      ================================================== */}
+
+      <div
+        className={
+          member.is_live
+            ? "member-photo-wrap member-photo-live"
+            : "member-photo-wrap"
+        }
+        onClick={
+          openYoutubeChannel
+        }
+        title={
+          member.youtube_url ||
+          member.channel_url
+            ? `${member.name} YouTube 채널`
+            : undefined
+        }
+        style={{
+          cursor:
+            member.youtube_url ||
+            member.channel_url
+              ? "pointer"
+              : "default"
+        }}
+      >
+
+        {member.youtube_profile_image ? (
+
+          <img
+            src={
+              member.youtube_profile_image
+            }
+            alt={
+              member.name
+            }
+          />
+
+        ) : (
+
+          <div className="member-photo-placeholder">
+
+            {member.name
+              ?.charAt(0)
+              ?.toUpperCase()}
+
+          </div>
+
+        )}
+
+
+        {/* ==================================================
+            LIVE 배지
+
+            배지 클릭은 YouTube 채널이 아니라
+            현재 LIVE 방송으로 이동
+        ================================================== */}
+
+        {member.is_live && (
+
+          <button
+            type="button"
+            className="member-live-badge"
+            onClick={(event) => {
+
+              // 부모 프로필 클릭 방지
+              event.stopPropagation();
+
+              openLive();
+
+            }}
+            title="라이브 방송 보기"
+          >
+
+            <Radio
+              size={11}
+            />
+
+            LIVE
+
+          </button>
+
+        )}
+
+      </div>
+
+
+      {/* ==================================================
+          직급 + 이름
+      ================================================== */}
+
+      <div className="member-title-row">
+
+        <span className="role-badge">
+
+          {member.role}
+
+        </span>
+
+
+        <strong>
+
+          {member.name}
+
+        </strong>
+
+      </div>
+
+
+      {/* ==================================================
+          LIVE 방송 제목
+      ================================================== */}
+
+      {member.is_live &&
+        member.live_title && (
+
+          <button
+            type="button"
+            className="member-live-title"
+            onClick={openLive}
+          >
+
+            <span>
+              LIVE NOW
+            </span>
+
+            <p>
+              {member.live_title}
+            </p>
+
+          </button>
+
+        )}
+
+
+      {/* ==================================================
+          프로필 / 공약 / 시그
+
+          대표는 표시하지 않음
+      ================================================== */}
+
+      {!leader && (
+
+        <div className="member-actions">
+
+
+          {/* 프로필 */}
+
+          <button
+            type="button"
+            disabled={
+              !member.member_profile_image
+            }
+            onClick={() =>
+              openImage(
+                "프로필",
+                member.member_profile_image
+              )
+            }
+          >
+
+            <i className="dot purple" />
+
+            프로필
+
+          </button>
+
+
+          {/* 공약 */}
+
+          <button
+            type="button"
+            disabled={
+              !member.promise_image
+            }
+            onClick={() =>
+              openImage(
+                "공약",
+                member.promise_image
+              )
+            }
+          >
+
+            <i className="dot gold" />
+
+            공약
+
+          </button>
+
+
+          {/* 시그 */}
+
+          <button
+            type="button"
+            disabled={
+              !member.signature_image
+            }
+            onClick={() =>
+              openImage(
+                "시그니처",
+                member.signature_image
+              )
+            }
+          >
+
+            <i className="dot cyan" />
+
+            시그
+
+          </button>
+
+        </div>
+
+      )}
+
+    </article>
+
+  );
+
+}
+
+
+// ======================================================
+// MemberPage
+// ======================================================
+
+export default function MemberPage() {
+
+  // ====================================================
+  // 멤버 데이터
+  // ====================================================
+
+  const [
+    members,
+    setMembers
+  ] = useState([]);
+
+
+  const [
+    loading,
+    setLoading
+  ] = useState(true);
+
+
+  const [
+    error,
+    setError
+  ] = useState(null);
+
+
+  // ====================================================
+  // 이미지 팝업
+  // ====================================================
+
+  const [
+    modal,
+    setModal
+  ] = useState(null);
+
+
+  // ====================================================
+  // 멤버 API 조회
+  //
+  // GET /members-page
+  //
+  // 멤버 정보 +
+  // LIVE 상태까지 포함
+  // ====================================================
+
+  const loadMembers =
+    async () => {
+
+      try {
+
+        setLoading(true);
+
+        setError(null);
+
+
+        const response =
+          await fetch(
+            `${API_BASE_URL}/members-page`
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            `멤버 목록 요청 실패 (${response.status})`
+          );
+
+        }
+
+
+        const result =
+          await response.json();
+
+
+        if (!result.success) {
+
+          throw new Error(
+            result.error ||
+            "멤버 목록을 불러오지 못했습니다."
+          );
+
+        }
+
+
+        // ================================================
+        // 직급순 정렬
+        // ================================================
+
+        const sortedMembers =
+          Array.isArray(result.data)
+
+            ? [...result.data].sort(
+                (a, b) => {
+
+                  const roleA =
+                    Number(
+                      a.role_order
+                    ) ||
+                    ROLE_ORDER[
+                      a.role
+                    ] ||
+                    99;
+
+
+                  const roleB =
+                    Number(
+                      b.role_order
+                    ) ||
+                    ROLE_ORDER[
+                      b.role
+                    ] ||
+                    99;
+
+
+                  if (
+                    roleA !== roleB
+                  ) {
+
+                    return (
+                      roleA -
+                      roleB
+                    );
+
+                  }
+
+
+                  const sortA =
+                    Number(
+                      a.sort_order
+                    ) || 0;
+
+
+                  const sortB =
+                    Number(
+                      b.sort_order
+                    ) || 0;
+
+
+                  if (
+                    sortA !== sortB
+                  ) {
+
+                    return (
+                      sortA -
+                      sortB
+                    );
+
+                  }
+
+
+                  return (
+                    Number(a.id) -
+                    Number(b.id)
+                  );
+
+                }
+              )
+
+            : [];
+
+
+        setMembers(
+          sortedMembers
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "❌ 멤버 페이지 조회 실패:",
+          error
+        );
+
+
+        setError(
+          error.message
+        );
+
+
+        setMembers([]);
+
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+  // ====================================================
+  // 최초 조회
+  // ====================================================
+
+  useEffect(() => {
+
+    loadMembers();
+
+  }, []);
+
+
+  // ====================================================
+  // 대표
+  // ====================================================
+
+  const leader =
+    members.find(
+      member =>
+        member.role === "대표"
+    );
+
+
+  // ====================================================
+  // 대표 제외 멤버
+  // ====================================================
+
+  const crewMembers =
+    members.filter(
+      member =>
+        member.role !== "대표"
+    );
+
+
+  // ====================================================
+  // 로딩
+  // ====================================================
+
+  if (loading) {
+
+    return (
+
+      <main className="members-page">
+
+        <div className="members-loading">
+
+          멤버 정보를 불러오는 중입니다.
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+  // ====================================================
+  // 오류
+  // ====================================================
+
+  if (error) {
+
+    return (
+
+      <main className="members-page">
+
+        <div className="members-error">
+
+          <strong>
+            멤버 정보를 불러오지 못했습니다.
+          </strong>
+
+
+          <p>
+            {error}
+          </p>
+
+
+          <button
+            type="button"
+            onClick={
+              loadMembers
+            }
+          >
+
+            다시 불러오기
+
+          </button>
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+  // ====================================================
+  // 화면
+  // ====================================================
+
+  return (
+
+    <>
+
+      <main className="members-page">
+
+
+        {/* ==================================================
+            상단
+        ================================================== */}
+
+        <div className="member-top-summary">
+
+          <div />
+
+
+          <div className="member-count">
+
+          
+
+            
+
+          </div>
+
+        </div>
+
+
+        {/* ==================================================
+            대표
+
+            대표는 프로필/공약/시그 버튼 없음
+        ================================================== */}
+
+        {leader && (
+
+          <section className="leader-section">
+
+            <MemberCard
+              member={leader}
+              leader
+              onImageOpen={
+                setModal
+              }
+            />
+
+          </section>
+
+        )}
+
+
+        {/* ==================================================
+            나머지 멤버
+        ================================================== */}
+
+        <section className="team-section">
+
+          <div className="team-divider">
+
+            <span />
+
+
+            <h2>
+
+              ROVENGERS{" "}
+
+              <b>
+                {crewMembers.length}명
+              </b>
+
+            </h2>
+
+
+            <span />
+
+          </div>
+
+
+          <div className="member-grid">
+
+            {crewMembers.map(
+              member => (
+
+                <MemberCard
+                  key={
+                    member.id
+                  }
+                  member={
+                    member
+                  }
+                  onImageOpen={
+                    setModal
+                  }
+                />
+
+              )
+            )}
+
+          </div>
+
+        </section>
+
+
+        {/* ==================================================
+            멤버 없음
+        ================================================== */}
+
+        {members.length === 0 && (
+
+          <div className="members-empty">
+
+            등록된 멤버가 없습니다.
+
+          </div>
+
+        )}
+
+      </main>
+
+
+      {/* ==================================================
+          이미지 팝업
+      ================================================== */}
+
+      <ImageModal
+        modal={modal}
+        onClose={() =>
+          setModal(null)
+        }
+      />
+
+    </>
+
+  );
+
+}
