@@ -435,9 +435,7 @@ export default function HomePage() {
                       {post.member_name || "멤버"}
                     </strong>
 
-                    <small>
-                      {post.published_text || ""}
-                    </small>
+                  
 
                     <b>
                       NEW
