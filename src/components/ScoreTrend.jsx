@@ -1084,7 +1084,7 @@ export default function ScoreTrend() {
 
 
             <h2>
-              회차별 점수 추이
+              회차별 점수
             </h2>
 
           </div>
