@@ -846,15 +846,7 @@ export default function SignaturePage() {
                           이미지 위 금액
                       ==================================== */}
 
-                      <div className="signature-price-big">
-
-                        {Number(
-                          item.amount || 0
-                        ).toLocaleString(
-                          "ko-KR"
-                        )}
-
-                      </div>
+                   
 
                     </div>
 
