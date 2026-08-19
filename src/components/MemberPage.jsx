@@ -388,10 +388,13 @@ function MemberCard({
             type="button"
             className="member-live-badge"
 
-            style={{
-              position: "relative",
-              zIndex: 3
-            }}
+              style={{
+                position: "absolute",
+                top: "10px",
+                left: "10px",
+                zIndex: 3
+              }}
+
 
             onClick={(event) => {
 
