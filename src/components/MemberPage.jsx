@@ -383,39 +383,50 @@ function MemberCard({
         ================================================== */}
 
         {member.is_live && (
+  <button
+    type="button"
+    className="member-live-badge"
 
-          <button
-            type="button"
-            className="member-live-badge"
+    style={{
+      position: "absolute",
+      top: "8px",
+      left: "8px",
+      zIndex: 3,
 
-              style={{
-                position: "absolute",
-                top: "10px",
-                left: "10px",
-                zIndex: 3
-              }}
+      width: "auto",
+      height: "24px",
 
+      minWidth: 0,
+      minHeight: 0,
 
-            onClick={(event) => {
+      padding: "0 8px",
 
-              event.stopPropagation();
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "4px",
 
-              openLive();
+      borderRadius: "999px",
 
-            }}
+      fontSize: "10px",
+      fontWeight: 800,
+      lineHeight: 1,
 
-            title="라이브 방송 보기"
-          >
+      whiteSpace: "nowrap"
+    }}
 
-            <Radio
-              size={11}
-            />
+    onClick={(event) => {
+      event.stopPropagation();
+      openLive();
+    }}
 
-            LIVE
+    title="라이브 방송 보기"
+  >
+    <Radio size={10} />
 
-          </button>
-
-        )}
+    LIVE
+  </button>
+)}
 
       </div>
 
